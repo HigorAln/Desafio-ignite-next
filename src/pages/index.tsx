@@ -1,4 +1,4 @@
-import { GetStaticProps } from 'next';
+import next, { GetStaticProps } from 'next';
 
 import Prismic from '@prismicio/client';
 import { format } from 'date-fns';
@@ -32,8 +32,32 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps): JSX.Element {
-  console.log(postsPagination);
   const [postsInScreen, setPostsInScreen] = useState<Post[]>([]);
+  const [next_page, setNext_page] = useState('');
+
+  const handleClick = (): void => {
+    fetch(next_page)
+      .then(res => res.json())
+      .then(res => {
+        const newValue = {
+          uid: res.results[0].uid,
+          first_publication_date: format(
+            new Date(res.results[0].first_publication_date),
+            'dd MMM yyy',
+            {
+              locale: ptBR,
+            }
+          ),
+          data: {
+            title: res.results[0].data.title,
+            subtitle: res.results[0].data.subtitle,
+            author: res.results[0].data.author,
+          },
+        };
+        setNext_page(res.next_page);
+        setPostsInScreen([...postsInScreen, newValue]);
+      });
+  };
 
   useEffect(() => {
     const posts = postsPagination.results.map((post): Post => {
@@ -53,6 +77,7 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
         },
       };
     });
+    setNext_page(postsPagination.next_page);
     setPostsInScreen(posts);
   }, [postsPagination]);
   return (
@@ -71,8 +96,14 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
             </div>
           </Link>
         ))}
-        <div>
-          <button type="button">here</button>
+        <div className={styles.buttonReadMore}>
+          {next_page !== null ? (
+            <button type="button" onClick={handleClick}>
+              Carregar mais posts
+            </button>
+          ) : (
+            ''
+          )}
         </div>
       </main>
     </>
@@ -84,7 +115,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const postsResponse = await prismic.query(
     Prismic.predicates.at('document.type', 'posts'),
     {
-      pageSize: 100,
+      pageSize: 1,
     }
   );
 

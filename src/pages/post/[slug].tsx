@@ -1,3 +1,5 @@
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable no-use-before-define */
 import { GetStaticPaths, GetStaticProps } from 'next';
 
 import Prismic from '@prismicio/client';
@@ -8,6 +10,7 @@ import PtBR from 'date-fns/locale/pt-BR';
 import ptBR from 'date-fns/locale/pt-BR';
 import { FiCalendar, FiUser, FiClock } from 'react-icons/fi';
 import React from 'react';
+import { useState } from 'react';
 import { getPrismicClient } from '../../services/prismic';
 import commonStyles from '../../styles/common.module.scss';
 import styles from './post.module.scss';
@@ -35,6 +38,7 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps): JSX.Element {
+  console.log(post);
   const { isFallback } = useRouter();
 
   if (isFallback) {
@@ -68,8 +72,8 @@ export default function Post({ post }: PostProps): JSX.Element {
             </span>
           </div>
           <section>
-            {post.data.content.map(postContent => (
-              <React.Fragment key={post.data.title}>
+            {post.data.content.map((postContent, index) => (
+              <React.Fragment key={index}>
                 <h1>{postContent.heading}</h1>
                 <p>{RichText.asText(postContent.body)}</p>
               </React.Fragment>
