@@ -1,14 +1,12 @@
-import next, { GetStaticProps } from 'next';
+import { GetStaticProps } from 'next';
 
 import Prismic from '@prismicio/client';
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
-import { Head } from 'next/document';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getPrismicClient } from '../services/prismic';
 
-import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 import Header from '../components/Header';
 
